@@ -24,8 +24,8 @@ class Tribunales:
         for i in range(0, len(piso)):
             if (piso[i]) != None:
                 contador +=1
-                
         return contador
+    
     def oficinasOcupadas(self, piso, ocupadas):
         oficOcupadas = np.empty((ocupadas), Juzgado)
         contador = 0
