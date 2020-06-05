@@ -1,4 +1,10 @@
 from Juzgados.Colas import Cola
+from Juzgados.tipoEstado import Estado
+from Juzgados.Expediente import Expediente
+from Juzgados.tipoFuero import Fuero
+
+from Juzgados.tipoPrioridad import Prioridad
+
 
 #TDA JUZGADO
 
@@ -13,24 +19,24 @@ class Juzgado:
     self.expUrgentes = Cola()
     self.expNormales = Cola()
     
-  def repr(self):
-        cadena = 'nombre del juzgado: '+ self.nombre + '\n' + 'expedientes prioridad normal: '+str(self.expNormales) + '\n'+ 'expedientes prioridad urgente: '+str(self.expUrgentes) + 'expedientes estado en Investigacion: '+str(self.enInvestigacion) + '\n'+ 'expedientes estado en Juicio: '+str(self.enJuicio)
+  def __repr__(self):
+        cadena = 'nombre del juzgado: '+ self.nombre + '\n' + 'expedientes prioridad normal: '+str(self.cantidadDeExpedientesNormales()) + '\n'+ 'expedientes prioridad urgente: '+str(self.cantidadDeExpedientesUrgentes()) + '\n' + 'expedientes estado en Investigacion: '+str(self.enInvestigacion()) + '\n'+ 'expedientes estado en Juicio: '+str(self.enJuicio())
         return cadena
   '''DEVUELVE EL NOMBRE DEL JUEZ'''  
   def getNombreJuez(self):
       return self.nombre  
   
   '''FUNCION QUE SE UTILIZA PARA IMPRIMIR SI LOS EXPEDIENTES ENTRARON EN ZONA CRITICA '''  
-  def controlarCrticidad(self, tipo):
-      if(tipo == "Normal") and (self.expNormales.len() > 50):
+  def controlarCriticidad(self, tipo):
+      if(tipo == "Normal") and (self.expNormales.len() > self.cantCritica):
           print("Expedientes Normales en cantidad critica")
-      elif(tipo == "Urgente") and (self.expUrgentes.len() > 50):
+      elif(tipo == "Urgente") and (self.expUrgentes.len() > self.cantCritica):
           print("Expedientes Urgentes en cantidad critica")
           
 
   '''FUNCION QUE RECIBE EL EXPEDIENTE Y LO AGREGA A LA COLA QUE PERTENECE'''
   def recibirExpediente(self, expediente):
-    if(expediente.getPrioridad() == "Normal"):
+    if(expediente.getPrioridad() == Prioridad.Normal):
        self.expNormales.encolar(expediente)
        '''LLAMO A LA FUNCION PARA DAR EL AVISO DE ESTADO CRITICO'''
        self.controlarCriticidad("Normal")
@@ -98,11 +104,11 @@ class Juzgado:
     '''CLONO LOS EXPEDIENTES URGENTES'''
     colaAuxUrgentes = self.expUrgentes.clonar()
     '''MIENTRAS LA COLA DE URGENTES NO ESTE VACIA'''
-    while not colaAuxUrgentes.isEmpty():
+    while not colaAuxUrgentes.estaVacia():
       '''SACO EL EXPEDIENTE DE LA COLA AUXILIAR'''
       exp = colaAuxUrgentes.desencolar()
       '''CONSULTO SI EL ESTADO DEL EXPEDIENTE ES EN JUICIO'''
-      if(exp.getEstado() == "Juicio"):
+      if(exp.getEstado() == Estado.Juicio):
         '''SI EL ESTADO ES JUICIO SUMAMOS 1'''
         cantidad = cantidad + 1
     return cantidad
@@ -112,9 +118,9 @@ class Juzgado:
     cantidad = 0
     exp = None
     colaAuxNormales = self.expNormales.clonar()
-    while not colaAuxNormales.isEmpty():
+    while not colaAuxNormales.estaVacia():
       exp = colaAuxNormales.desencolar()
-      if(exp.getEstado() == "Juicio"):
+      if(exp.getEstado() == Estado.Juicio):
         cantidad = cantidad + 1
     return cantidad
 
@@ -123,6 +129,8 @@ class Juzgado:
   def enJuicio(self):
     return self.enJuicioUrgentes() + self.enJuicioNormales()
 
+  def enInvestigacion(self):
+      return self.expNormales.len() + self.expUrgentes.len() - self.enJuicio()
           
         
   '''FUNCION QUE BUSCA UN EXPEDIENTE POR NUMERO'''
@@ -136,13 +144,13 @@ class Juzgado:
     expediente = None
     '''MIENTRAS LA COLA DE EXPEDIENTES NORMALES NO ESTE VACIO O SI TODAVIA NO SE 
     ENCONTRO EL EXPEDIENTE'''
-    while not colaAuxNormales.isEmpty() and encontrado == False:
+    while not colaAuxNormales.estaVacia() and encontrado == False:
       exp = colaAuxNormales.desencolar()
       '''EL NUMERO DEL EXPEDIENTE DESENCOLADO SE COMPARA CON EL NUMERO QUE SE DESEA BUSCAR'''
       if(exp.getNumero() == numero):
         encontrado = True
         expediente = exp
-    while not colaAuxUrgentes.isEmpty() and encontrado == False:
+    while not colaAuxUrgentes.estaVacia() and encontrado == False:
       exp = colaAuxUrgentes.desencolar()
       if(exp.getNumero() == numero):
         encontrado = True
@@ -162,7 +170,7 @@ class Juzgado:
         '''CONSULTO SI EL EXPEDIETE DE LA PRIMERA POSICION NO ES EL EXPEDIENTE BUSCADO'''  
         if colaNormAux.top().getNumero() != numero:
             '''COMO NO ES EL EXPEDIENTE A ELIMINAR LO VUELVO A GUARDAR EN LA COLA ORIGINAL'''
-            self.expNormales.encolar()(colaNormAux.desencolar())
+            self.expNormales.encolar(colaNormAux.desencolar())
         else:
             '''SI EL EXPEDIENTE ES IGUAL AL NUMERO BUSCADO LO ELIMINO DE LA COLA AUXILIAR
             PERO NO LO GUARDO EN LA COLA ORIGINAL'''
@@ -172,18 +180,18 @@ class Juzgado:
       return encontrado
   
   def eliminarExpUrgente(self, numero):
-      colaUrgAux = self.expUrgentes.clone()
+      colaUrgAux = self.expUrgentes.clonar()
       self.expUrgentes.vaciar()
       encontrado = False
       while not colaUrgAux.estaVacia():
         if colaUrgAux.top().getNumero() != numero:
-            self.expUrgentes.encolar()(colaUrgAux.desencolar())
+            self.expUrgentes.encolar(colaUrgAux.desencolar())
         else:
             colaUrgAux.desencolar()
             encontrado = True
       return encontrado
       
-
+  
   
 
        
@@ -191,15 +199,15 @@ class Juzgado:
   PARA CADA TIPO'''          
   def eliminarExpediente(self,nroExp):
       '''SI NO SE ENCONTRO EL EXPEDIENTE EN LA COLA DE NORMALES'''
-      if not self.eliminarExpNormal():
+      if not self.eliminarExpNormal(nroExp):
           '''SE BUSCA EN LA COLA DE URGENTES'''
-          if not self.eliminarExpUrgente():
+          if not self.eliminarExpUrgente(nroExp):
               '''SI NO SE ENCUENTRA EL ARCHIVO EN NINGUNA DE LAS COLAS SE DA EL MENSAJE DE ERROR'''
               return "El archivo se elimino correctamente"
 
   def cambiarDeEstado(self,numero):
       '''CLONO LAS DOS COLAS''' 
-      colaUrgAux = self.expUrgentes.clone()
+      colaUrgAux = self.expUrgentes.clonar()
       colaNormAux = self.expNormales.clonar()
       encontrado = False
         
@@ -209,22 +217,62 @@ class Juzgado:
       '''RECORRO LAS COLAS AUXILIARES Y SI NO SON IGUALES AL NUMERO LAS ENCOLO EN LAS COLAS ORIGINALES'''
       while not colaUrgAux.estaVacia():
         if colaUrgAux.top().getNumero() != numero:
-            self.expUrgentes.encolar()(colaUrgAux.desencolar())  
+            self.expUrgentes.encolar(colaUrgAux.desencolar())  
         else:
-            self.expNormales.encolar(colaUrgAux.desencolar())
+            exp = colaUrgAux.desencolar()
+            exp.setPrioridad(Prioridad.Normal)
+            self.expNormales.encolar(exp)
       '''CONSULTO SI SE ENCONTRO EL EXPEDIENTE PORQUE SINO LO VOLVERIA A PASAR A LA OTRA COLA'''      
       if(not encontrado):
           self.expNormales.vaciar()
           while not colaNormAux.estaVacia():
               if colaNormAux.top().getNumero() != numero:
-                  self.expNormales.encolar()(colaNormAux.desencolar())
+                  self.expNormales.encolar(colaNormAux.desencolar())
               else:
-                  self.expUrgentes.encolar(colaNormAux.desencolar())
+                  exp = colaNormAux.desencolar()
+                  exp.setPrioridad(Prioridad.Urgente)
+                  self.expUrgentes.encolar(exp)
+                  
 
     
 
-    
-    
+juzgado = Juzgado("Oyarbide", 4)   
+
+
+exp1 = Expediente(1, Fuero.Comercial, Prioridad.Normal, Estado.Investigacion)
+exp2 = Expediente(2, Fuero.Civil, Prioridad.Urgente, Estado.Juicio)
+exp3 = Expediente(3, Fuero.Familia, Prioridad.Normal, Estado.Investigacion)
+exp4 = Expediente(4, Fuero.Penal, Prioridad.Normal, Estado.Juicio)
+exp5 = Expediente(5, Fuero.Penal, Prioridad.Urgente, Estado.Juicio)
+exp6 = Expediente(6, Fuero.Penal, Prioridad.Normal, Estado.Investigacion)
+
+juzgado.recibirExpediente(exp1)
+juzgado.recibirExpediente(exp2)
+juzgado.recibirExpediente(exp3)
+juzgado.recibirExpediente(exp4)
+juzgado.recibirExpediente(exp5)
+juzgado.recibirExpediente(exp6)
+
+juzgado.esCritico()
+print("La cantidad de expedientes Normales es: " + str(juzgado.cantidadDeExpedientesNormales()))
+print("La cantidad de expedientes Urgentes es: " + str(juzgado.cantidadDeExpedientesUrgentes()))
+
+print(juzgado)
+
+print(juzgado.buscarExpediente(1))
+
+print(juzgado.primerExpedienteATratar())
+
+juzgado.eliminarExpediente(2)
+print(juzgado.primerExpedienteATratar())
+
+
+print(exp1)
+juzgado.cambiarDeEstado(1)
+print(exp1)
+
+
+
     
 
     

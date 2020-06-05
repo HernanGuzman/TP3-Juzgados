@@ -2,6 +2,9 @@ import numpy as np
 from Juzgados.juzgados import Juzgado
 from Juzgados.Pila import Pila
 from Juzgados.tipoPrioridad import Prioridad
+from Juzgados.Expediente import Expediente
+from Juzgados.tipoFuero import Fuero
+from Juzgados.tipoEstado import Estado
 
 
 '''TDA TRIBUNALES'''
@@ -10,24 +13,47 @@ class Tribunales:
     def __init__(self, pisos =5, oficinas =2):
         self.edificio = np.empty((pisos, oficinas), Juzgado)
     def __repr__(self):
-        return str(self.tribunales)
+        return str(self.edificio)
     
     '''AGREGO UN JUZGADO A UNA OFICINA DEL EDIFICIO'''
     def establecerJuzgado(self, piso, oficina, Juzgado):
         self.edificio[piso, oficina] = Juzgado
     
-    
+    def cantOficinasOcupadas(self, piso):
+        contador = 0
+        for i in range(0, len(piso)):
+            if (piso[i]) != None:
+                contador +=1
+                
+        return contador
+    def oficinasOcupadas(self, piso, ocupadas):
+        oficOcupadas = np.empty((ocupadas), Juzgado)
+        contador = 0
+        for i in range(0, len(piso)):
+            if (piso[i]) != None:
+                oficOcupadas[contador] = piso[i]
+                contador += 1
+        return oficOcupadas
+        
+        
     '''RECIBO EL PISO DONDE SE DEBE BUSCAR EL JUZGADO CRITICO'''
+    
     def buscarCriticos(self, piso):
-        '''CONSULTO SI EL TAMAÑO DEL ARRAY ES IGUAL A 1'''
+        
+        
+        
+        
         if(len(piso)==1):
+            juzgado = piso[0]
+            if juzgado.esCritico()
+            
             '''SI ES ASI CONSULTO SI ES CRITICO PARA DEVOLVER 1'''
-            if self.edificio[piso, 0].esCritico():
+            if piso[0].esCritico():
                 return 1
             else:
                 return 0
         else:
-            '''SI EL ARRAY NO ES DE TAMAÑO 1 CONSULTO SI ES JUZGADO DE LA POSICION 0 ES CRITICO'''
+            
             if self.edificio[piso, 0].esCritico():
                 '''SI ES CRITICO SUMO 1 Y VUELVO A LLAMAR A LA FUNCION PERO CON EL ARRAY SIN
                 LA POSICION 0'''
@@ -42,7 +68,10 @@ class Tribunales:
     def cantidadDeJuzgadosCriticos(self,piso):
         '''RECIBO DE LA FUNCION BUSCAR CRITICOS LA CANTIDAD DE JUZGADOS EN ESTADO CRITICOS
         A LA FUNCION LE PASO EL ARRAY DEL PISO'''
-        cantidad = self.buscarCriticos(self.edificio[piso])
+        ocupadas = self.cantOficinasOcupadas(self.edificio[piso])
+        oficOcupadas = self.oficinasOcupadas(self.edificio[piso], ocupadas)
+        
+        cantidad = self.buscarCriticos(oficOcupadas)
         return cantidad
         
     '''RECORRO TODO EL EDIFICIO PARA ENCONTRAR EL JUZGADO CON MENOS EXPEDIENTES'''        
@@ -103,3 +132,32 @@ class Tribunales:
 tribunales = Tribunales(2,3) 
 
 print(tribunales)
+
+juzgado = Juzgado("Oyarbide", 4)   
+
+
+exp1 = Expediente(1, Fuero.Comercial, Prioridad.Normal, Estado.Investigacion)
+exp2 = Expediente(2, Fuero.Civil, Prioridad.Urgente, Estado.Juicio)
+exp3 = Expediente(3, Fuero.Familia, Prioridad.Normal, Estado.Investigacion)
+exp4 = Expediente(4, Fuero.Penal, Prioridad.Normal, Estado.Juicio)
+exp5 = Expediente(5, Fuero.Penal, Prioridad.Urgente, Estado.Juicio)
+exp6 = Expediente(6, Fuero.Penal, Prioridad.Normal, Estado.Investigacion)
+
+juzgado.recibirExpediente(exp1)
+juzgado.recibirExpediente(exp2)
+juzgado.recibirExpediente(exp3)
+juzgado.recibirExpediente(exp4)
+juzgado.recibirExpediente(exp5)
+juzgado.recibirExpediente(exp6)
+
+tribunales = Tribunales(2,3) 
+
+
+
+tribunales.establecerJuzgado(1, 2, Juzgado)
+
+print(tribunales)
+
+tribunales.cantidadDeJuzgadosCriticos(1)
+
+

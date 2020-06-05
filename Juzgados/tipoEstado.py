@@ -1,6 +1,6 @@
 from enum import Enum
 
-class Estado(int, Enum):
-    Investigacion = 0
-    Juicio = 1
+class Estado(str, Enum):
+    Investigacion = 'Investigacion'
+    Juicio = 'Juicio'
    

@@ -11,7 +11,7 @@ class Expediente:
     self.estado = estado
     
   def __repr__(self):
-    return "Numero Expediente: " + str(self.numero)  + " Fuero: " + str(self.fuero) + " Prioridad: " + str(self.prioridad) + " Estado: " + str(self.estado)
+    return "Numero Expediente: " + str(self.numero) + '\n' + " Fuero: " + str(self.fuero.value)+ '\n' + " Prioridad: " + str(self.prioridad.value)+ '\n' + " Estado: " + str(self.estado.value)
    
 
   def getPrioridad(self):
@@ -20,8 +20,16 @@ class Expediente:
   def getEstado(self):
     return self.estado
 
+  def setEstado(self,nuevoEstado):
+      self.estado=nuevoEstado
+      
+  def setPrioridad(self,nuevaPrioridad):
+      self.prioridad = nuevaPrioridad
+
   def getNumero(self):
     return self.numero
 
-  
+
+exp = Expediente(1, Fuero.Comercial, Prioridad.Normal, Estado.Investigacion)
+print(exp)
     

@@ -13,13 +13,13 @@ class Cola:
 
   def desencolar(self):
     dato = None
-    if not self.isEmpty():
+    if not self.estaVacia():
       dato = self.cola.pop()
     return dato
 
   def top(self):
     dato = None
-    if not self.isEmpty():
+    if not self.estaVacia():
       dato = self.cola[len(self.cola)-1]
     return dato
 
@@ -29,7 +29,7 @@ class Cola:
   def clonar(self):
     nueva = Cola()
     for elemento in self.cola:
-      nueva.queue(elemento)
+      nueva.encolar(elemento)
     return nueva
 
   def len(self):
