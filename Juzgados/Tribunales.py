@@ -42,26 +42,24 @@ class Tribunales:
         
         
         
-        
+        juzgado = piso[0]
         if(len(piso)==1):
-            juzgado = piso[0]
-            if juzgado.esCritico()
-            
             '''SI ES ASI CONSULTO SI ES CRITICO PARA DEVOLVER 1'''
-            if piso[0].esCritico():
+            
+            if juzgado.esCritico():
                 return 1
             else:
                 return 0
         else:
             
-            if self.edificio[piso, 0].esCritico():
+            if juzgado.esCritico():
                 '''SI ES CRITICO SUMO 1 Y VUELVO A LLAMAR A LA FUNCION PERO CON EL ARRAY SIN
                 LA POSICION 0'''
-                return 1 + self.buscarCriticos(self.edificio[piso, 1:])
+                return 1 + self.buscarCriticos(piso[1:])
             else:
                 '''SI NO ES CRITICO SUMO VUELVO A LLAMAR A LA FUNCION PERO CON EL ARRAY SIN
                 LA POSICION 0'''
-                return self.buscarCriticos(self.edificio[piso, 1:])
+                return self.buscarCriticos(piso[1:])
             
             
     '''RECIBO EL NUMERO DE PISO PARA CONSULTAR LOS JUZGADOS CRITICOS'''
@@ -79,13 +77,16 @@ class Tribunales:
         pisoMenosExp = 0
         oficinaMenosExp = 0
         expedientes = 100
+              
         '''RECORRO TODO EL EDIFICIO'''
         for piso in range(len(self.edificio)):
             for oficina in range(len(self.edificio[piso])):
-                '''CONSULTO SI EL JUZGADO TIENE MENOS EXPEDIENTES URGENTES QUE EL GUARDADO'''
-                if(self.edificio[piso,oficina].cantidadDeExpedientesUrgentes()<expedientes):
-                    pisoMenosExp = piso
-                    oficinaMenosExp = oficina
+                if(self.edificio[piso, oficina] != None):
+                    '''CONSULTO SI EL JUZGADO TIENE MENOS EXPEDIENTES URGENTES QUE EL GUARDADO'''
+                    if(self.edificio[piso,oficina].cantidadDeExpedientesUrgentes()<expedientes):
+                        pisoMenosExp = piso
+                        oficinaMenosExp = oficina
+                        expedientes = self.edificio[piso,oficina].cantidadDeExpedientesUrgentes()
         return pisoMenosExp, oficinaMenosExp
              
     '''BUSCO EL JUZGADO DEL JUEZ'''
@@ -93,8 +94,9 @@ class Tribunales:
         '''RECORRO EL EDIFICIO (MATRIZ) HASTA ENCONTRAR EL JUZGADO DEL JUEZ'''
         for piso in range(len(self.edificio)):
             for oficina in range(len(self.edificio[piso])):
-                if(self.edificio[piso,oficina].getNombreJuez == juez):
-                    return piso, oficina
+                 if(self.edificio[piso, oficina] != None):
+                     if(self.edificio[piso,oficina].getNombreJuez() == juez):
+                         return piso, oficina
                     
     '''ENVIO A LA MESA DE ENTRADA UNA PILA DE EXPEDIENTES Y EL JUEZ DE GUARDIA'''
     def mesaDeEntradas(self, pilaDeExpedientes, juez):
@@ -121,19 +123,23 @@ class Tribunales:
         '''CONSULTO EL PISO Y OFICINA DEL JUEZ DE DESTINO'''
         pisoDest, oficinaDest = self.buscaJuez(juezDestino)
         '''BUSCO EL EXPEDIENTE DEL JUZGADO'''
-        exp = self.edificio[pisoOrgien, oficinaDest].buscarExpediente(numero)
-        '''ELIMINO EL EXPEDIENTE EN EL JUZGADO DE ORIGEN'''
-        self.edificio[pisoOrgien, oficinaDest].eliminarExpediente(numero)
-        '''ENVIO EL EXPEDIENTE A EL JUZGADO DEL JUEZ DE DESTINO'''
-        self.edificio[pisoDest, oficinaDest].recibirExpediente(exp)
-        
+        exp = self.edificio[pisoOrgien, oficinaOrigen].buscarExpediente(numero)
+        if(exp != None):
+            '''ELIMINO EL EXPEDIENTE EN EL JUZGADO DE ORIGEN'''
+            self.edificio[pisoOrgien, oficinaDest].eliminarExpediente(numero)
+            '''ENVIO EL EXPEDIENTE A EL JUZGADO DEL JUEZ DE DESTINO'''
+            self.edificio[pisoDest, oficinaDest].recibirExpediente(exp)
+            print("El Expediente se movio correctamente al juzgado del doctor : " + juezDestino)
+        else:
+            print("El Expediente no se encuentra en el juzgado indicado")
         
 
 tribunales = Tribunales(2,3) 
 
 print(tribunales)
 
-juzgado = Juzgado("Oyarbide", 4)   
+juzgado1 = Juzgado("Oyarbide", 3)
+juzgado2 = Juzgado("Gonzalez", 4)   
 
 
 exp1 = Expediente(1, Fuero.Comercial, Prioridad.Normal, Estado.Investigacion)
@@ -142,22 +148,63 @@ exp3 = Expediente(3, Fuero.Familia, Prioridad.Normal, Estado.Investigacion)
 exp4 = Expediente(4, Fuero.Penal, Prioridad.Normal, Estado.Juicio)
 exp5 = Expediente(5, Fuero.Penal, Prioridad.Urgente, Estado.Juicio)
 exp6 = Expediente(6, Fuero.Penal, Prioridad.Normal, Estado.Investigacion)
+exp7 = Expediente(7, Fuero.Comercial, Prioridad.Normal, Estado.Investigacion)
+exp8 = Expediente(8, Fuero.Civil, Prioridad.Urgente, Estado.Juicio)
+exp9 = Expediente(9, Fuero.Familia, Prioridad.Normal, Estado.Investigacion)
+exp10 = Expediente(10, Fuero.Penal, Prioridad.Normal, Estado.Juicio)
+exp11 = Expediente(11, Fuero.Penal, Prioridad.Urgente, Estado.Juicio)
+exp12 = Expediente(12, Fuero.Penal, Prioridad.Normal, Estado.Investigacion)
 
-juzgado.recibirExpediente(exp1)
-juzgado.recibirExpediente(exp2)
-juzgado.recibirExpediente(exp3)
-juzgado.recibirExpediente(exp4)
-juzgado.recibirExpediente(exp5)
-juzgado.recibirExpediente(exp6)
+juzgado1.recibirExpediente(exp1)
+juzgado1.recibirExpediente(exp2)
+juzgado1.recibirExpediente(exp3)
+juzgado1.recibirExpediente(exp4)
+juzgado1.recibirExpediente(exp5)
+juzgado1.recibirExpediente(exp6)
+
+juzgado2.recibirExpediente(exp1)
+juzgado2.recibirExpediente(exp2)
+juzgado2.recibirExpediente(exp3)
+juzgado2.recibirExpediente(exp4)
+juzgado2.recibirExpediente(exp5)
+juzgado2.recibirExpediente(exp6)
 
 tribunales = Tribunales(2,3) 
 
 
 
-tribunales.establecerJuzgado(1, 2, Juzgado)
+tribunales.establecerJuzgado(1, 2, juzgado1)
+tribunales.establecerJuzgado(1, 1, juzgado2)
 
 print(tribunales)
 
 tribunales.cantidadDeJuzgadosCriticos(1)
+
+print("La cantidad de juzgados en estado critico es: " + str(tribunales.cantidadDeJuzgadosCriticos(1)))
+piso, oficina = tribunales.juzgadoMenosRecargado()
+print("El juzgado menos cargado se encuentra en el piso: " + str(piso) + " oficina: " + str(oficina))
+piso, oficina = tribunales.buscaJuez("Oyarbide")
+print("El juzgado el juez se encuentra en el piso: " + str(piso) + " oficina: " + str(oficina))
+
+
+pilaExp = Pila()
+pilaExp.apilar(exp7)
+pilaExp.apilar(exp8)
+pilaExp.apilar(exp9)
+pilaExp.apilar(exp10)
+pilaExp.apilar(exp11)
+pilaExp.apilar(exp12)
+
+tribunales.mesaDeEntradas(pilaExp, "Oyarbide")
+
+print(tribunales)
+
+tribunales.moverExpediente(12, "Gonzalez", "Oyarbide")
+
+
+
+
+
+
 
 
